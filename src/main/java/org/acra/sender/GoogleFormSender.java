@@ -82,9 +82,9 @@ public class GoogleFormSender implements ReportSender {
             Log.d(LOG_TAG, "Connect to " + reportUrl);
 
             final HttpRequest request = new HttpRequest();
-            request.setConnectionTimeOut(ACRA.getConfig().connectionTimeout());
-            request.setSocketTimeOut(ACRA.getConfig().socketTimeout());
-            request.setMaxNrRetries(ACRA.getConfig().maxNumberOfRequestRetries());
+//            request.setConnectionTimeOut(ACRA.getConfig().connectionTimeout());
+//            request.setSocketTimeOut(ACRA.getConfig().socketTimeout());
+//            request.setMaxNrRetries(ACRA.getConfig().maxNumberOfRequestRetries());
             request.send(reportUrl, Method.POST, HttpRequest.getParamsAsFormString(formParams), Type.FORM);
 
         } catch (IOException e) {
