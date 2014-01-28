@@ -44,6 +44,8 @@ import org.apache.http.util.EntityUtils;
 
 public final class HttpRequest {
 
+	private static final HttpClient HTTP_CLIENT = getHttpClient();
+
     private static class SocketTimeOutRetryHandler implements HttpRequestRetryHandler {
 
         private final HttpParams httpParams;
@@ -89,9 +91,9 @@ public final class HttpRequest {
 
     private String login;
     private String password;
-    private int connectionTimeOut = 3000;
-    private int socketTimeOut = 3000;
-    private int maxNrRetries = 3;
+//    private int connectionTimeOut = 3000;
+//    private int socketTimeOut = 3000;
+//    private int maxNrRetries = 3;
     private Map<String,String> headers;
     
     public void setLogin(String login) {
@@ -102,13 +104,13 @@ public final class HttpRequest {
         this.password = password;
     }
 
-    public void setConnectionTimeOut(int connectionTimeOut) {
-        this.connectionTimeOut = connectionTimeOut;
-    }
-
-    public void setSocketTimeOut(int socketTimeOut) {
-        this.socketTimeOut = socketTimeOut;
-    }
+//    public void setConnectionTimeOut(int connectionTimeOut) {
+//        this.connectionTimeOut = connectionTimeOut;
+//    }
+//
+//    public void setSocketTimeOut(int socketTimeOut) {
+//        this.socketTimeOut = socketTimeOut;
+//    }
 
     public void setHeaders(Map<String,String> headers) {
        this.headers = headers;
@@ -122,9 +124,9 @@ public final class HttpRequest {
      *            Max number of times to retry Request on failure due to
      *            SocketTimeOutException.
      */
-    public void setMaxNrRetries(int maxNrRetries) {
-        this.maxNrRetries = maxNrRetries;
-    }
+//    public void setMaxNrRetries(int maxNrRetries) {
+//        this.maxNrRetries = maxNrRetries;
+//    }
 
     /**
      * Posts to a URL.
@@ -138,7 +140,6 @@ public final class HttpRequest {
      */
     public void send(URL url, Method method, String content, Type type) throws IOException {
 
-        final HttpClient httpClient = getHttpClient();
         final HttpEntityEnclosingRequestBase httpRequest = getHttpRequest(url, method, content, type);
 
         ACRA.log.d(ACRA.LOG_TAG, "Sending request to " + url);
@@ -149,7 +150,7 @@ public final class HttpRequest {
 
         HttpResponse response = null;
         try {
-            response = httpClient.execute(httpRequest, new BasicHttpContext());
+            response = HTTP_CLIENT.execute(httpRequest, new BasicHttpContext());
             if (response != null) {
                 final StatusLine statusLine = response.getStatusLine();
                 if (statusLine != null) {
@@ -196,11 +197,11 @@ public final class HttpRequest {
     /**
      * @return HttpClient to use with this HttpRequest.
      */
-    private HttpClient getHttpClient() {
+    private static HttpClient getHttpClient() {
         final HttpParams httpParams = new BasicHttpParams();
         httpParams.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.RFC_2109);
-        HttpConnectionParams.setConnectionTimeout(httpParams, connectionTimeOut);
-        HttpConnectionParams.setSoTimeout(httpParams, socketTimeOut);
+        HttpConnectionParams.setConnectionTimeout(httpParams, ACRA.getConfig().connectionTimeout());
+        HttpConnectionParams.setSoTimeout(httpParams, ACRA.getConfig().socketTimeout());
         HttpConnectionParams.setSocketBufferSize(httpParams, 8192);
 
         final SchemeRegistry registry = new SchemeRegistry();
@@ -214,7 +215,7 @@ public final class HttpRequest {
         final ClientConnectionManager clientConnectionManager = new ThreadSafeClientConnManager(httpParams, registry);
         final DefaultHttpClient httpClient = new DefaultHttpClient(clientConnectionManager, httpParams);
 
-        final HttpRequestRetryHandler retryHandler = new SocketTimeOutRetryHandler(httpParams, maxNrRetries);
+        final HttpRequestRetryHandler retryHandler = new SocketTimeOutRetryHandler(httpParams, ACRA.getConfig().maxNumberOfRequestRetries());
         httpClient.setHttpRequestRetryHandler(retryHandler);
 
         return httpClient;

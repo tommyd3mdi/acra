@@ -212,9 +212,9 @@ public class HttpSender implements ReportSender {
                     .getConfig().formUriBasicAuthPassword();
 
             final HttpRequest request = new HttpRequest();
-            request.setConnectionTimeOut(ACRA.getConfig().connectionTimeout());
-            request.setSocketTimeOut(ACRA.getConfig().socketTimeout());
-            request.setMaxNrRetries(ACRA.getConfig().maxNumberOfRequestRetries());
+//            request.setConnectionTimeOut(ACRA.getConfig().connectionTimeout());
+//            request.setSocketTimeOut(ACRA.getConfig().socketTimeout());
+//            request.setMaxNrRetries(ACRA.getConfig().maxNumberOfRequestRetries());
             request.setLogin(login);
             request.setPassword(password);
             request.setHeaders(ACRA.getConfig().getHttpHeaders());
